@@ -391,6 +391,24 @@ void set_nodes_to_empty(char *empty_node1, char *empty_node2)
         empty_node2[0] = '\0';
 }
 /**
+* get_file_size() - Reads and parses information from the map file
+* containing a description of a graph.
+* @fp:   Pointer to file. 
+*
+* Returns: Number of characters in file
+*/
+int get_file_size(FILE *fp){
+	//Save position of beginning
+	long int prev = ftell(fp);
+	// Go to end of file
+	fseek(fp, 0L, SEEK_END);
+	// Save position of end
+	long int sz = ftell(fp);
+	// Go back to beginning
+	fseek(fp,prev,SEEK_SET);
+	return sz;
+}
+/**
 * read_map() - Reads and parses information from the map file
 * containing a description of a graph.
 * @argv: Command line arguments.
@@ -402,8 +420,6 @@ void set_nodes_to_empty(char *empty_node1, char *empty_node2)
 */
 int read_map(const char **argv, int *iter, char **str1, char **str2)
 {
-        char line[BUFSIZE];
-        char **information = malloc(BUFSIZE);
         FILE *in;
         int edges, length1, length2;
         int check = 0;
@@ -420,8 +436,11 @@ int read_map(const char **argv, int *iter, char **str1, char **str2)
                 fprintf(stderr,"ERROR: Empty file!\n");
                 exit(EXIT_FAILURE);
         }
+	long int file_size = get_file_size(in);
+        char line[file_size];
+        char **information = malloc(file_size);
 
-        while (fgets(line, BUFSIZE, in) != NULL)
+        while (fgets(line, file_size, in) != NULL)
         {       //If line from map-file is blank or comment
                 if (line_is_blank(line) || line_is_comment(line))
                 {

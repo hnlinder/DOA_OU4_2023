@@ -1,12 +1,12 @@
 CC=gcc
 CFLAGS = -std=c99 -Wall -g
 DATAPATH = ../datastructures-v1.0.14.2
-INC = -I DATAPATH/include/
+INC = -I $(DATAPATH)/include/
 
 # NOTE: these object paths assume that you make them in their respective datastructures-v1.0.9 folders
-OBJECTS = graph.o DATAPATH/src/queue/queue.o DATAPATH/src/dlist/dlist.o DATAPATH/src/list/list.o
+OBJECTS = graph.o  $(DATAPATH)/src/queue/queue.o $(DATAPATH)/src/dlist/dlist.o $(DATAPATH)/src/list/list.o
 
-GRAPHOBJECTS = DATAPATH/src/dlist/dlist.o
+GRAPHOBJECTS =$(DATAPATH)/src/dlist/dlist.o
 
 
 # testmft: mtftable delim mwe1
