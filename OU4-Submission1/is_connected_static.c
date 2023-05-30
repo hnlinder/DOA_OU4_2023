@@ -22,8 +22,8 @@
 *   2022-05-30: v1.0, first public version.
 */
 
-#define BUFSIZE 150
-#define bufsize 100
+#define BUFSIZE 500
+/*#define bufsize 100*/
 typedef struct graph
 {
         int *node_max;
@@ -391,24 +391,6 @@ void set_nodes_to_empty(char *empty_node1, char *empty_node2)
         empty_node2[0] = '\0';
 }
 /**
-* get_file_size() - Reads and parses information from the map file
-* containing a description of a graph.
-* @fp:   Pointer to file. 
-*
-* Returns: Number of characters in file
-*/
-int get_file_size(FILE *fp){
-	//Save position of beginning
-	long int prev = ftell(fp);
-	// Go to end of file
-	fseek(fp, 0L, SEEK_END);
-	// Save position of end
-	long int sz = ftell(fp);
-	// Go back to beginning
-	fseek(fp,prev,SEEK_SET);
-	return sz;
-}
-/**
 * read_map() - Reads and parses information from the map file
 * containing a description of a graph.
 * @argv: Command line arguments.
@@ -418,8 +400,10 @@ int get_file_size(FILE *fp){
 *
 * Returns: Number of edges in the graph.
 */
-int read_map(const char **argv, int *iter, char **str1, char **str2, long int* file_size)
+int read_map(const char **argv, int *iter, char **str1, char **str2)
 {
+        char line[BUFSIZE];
+        char **information = malloc(BUFSIZE);
         FILE *in;
         int edges, length1, length2;
         int check = 0;
@@ -436,11 +420,8 @@ int read_map(const char **argv, int *iter, char **str1, char **str2, long int* f
                 fprintf(stderr,"ERROR: Empty file!\n");
                 exit(EXIT_FAILURE);
         }
-	*file_size = get_file_size(in);
-        char line[file_size];
-        char **information = malloc(file_size);
 
-        while (fgets(line, file_size, in) != NULL)
+        while (fgets(line, BUFSIZE, in) != NULL)
         {       //If line from map-file is blank or comment
                 if (line_is_blank(line) || line_is_comment(line))
                 {
@@ -555,10 +536,9 @@ int main(int argc, const char **argv)
         int *iter = &it;
         char **str1 = malloc(BUFSIZE);
         char **str2 = malloc(BUFSIZE);
-	long int file_size = 0;
 
         // Read map file, return nr of edges
-        edges = read_map(argv, iter, str1, str2, &file_size);
+        edges = read_map(argv, iter, str1, str2);
 
         //Build graph from map information
         graph *g = build_graph(str1, str2, count_nodes(str1, str2, edges), edges);

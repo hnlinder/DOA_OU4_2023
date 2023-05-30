@@ -1,2 +1,3 @@
-v. 1.0 - First submission
-v. 2.0  -
+v. 1.0  - First submission.
+v. 2.0  - Changed so that all mallocs depend on file size (fixes crash for big maps). 
+	- Moved reading the file to own function, open_file(). 

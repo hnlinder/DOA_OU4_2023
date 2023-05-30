@@ -28,8 +28,8 @@
 *   2023-05-19: v1.0, first submission.
 */
 
-#define BUFSIZE 150
-#define bufsize 100
+//#define BUFSIZE 150
+/*#define bufsize 100*/
 
 /**
 * first_non_white_space() - Check where first non-whitespace is.
@@ -342,6 +342,43 @@ bool find_path(graph *g, node *src, node *dest)
 }
 
 /**
+* get_file_size() - Reads and parses information from the map file
+* containing a description of a graph.
+* @fp:   Pointer to file. 
+*
+* Returns: Number of characters in file
+*/
+long int get_file_size(const char **argv)
+{
+        FILE *in;
+        // Reads in the map-file to 'in'
+        if (argv[1] != NULL)
+        {
+                in = fopen(argv[1], "r");
+        }
+        else 
+        {
+                fprintf(stderr,"ERROR: No input!\n");
+                exit(EXIT_FAILURE);
+        }
+        if(in == NULL) 
+        {
+                fprintf(stderr,"ERROR: Empty file!\n");
+                exit(EXIT_FAILURE);
+        }
+        // Save position of beginning
+	long int prev = ftell(in);
+	// Go to end of file
+	fseek(in, 0L, SEEK_END);
+	// Save position of end
+	long int sz = ftell(in);
+	// Go back to beginning
+	fseek(in,prev,SEEK_SET);
+	fclose(in);
+	return sz;
+}
+
+/**
 * count_nodes() - Counts the number of unique nodes in 2 given strings.
 * @str1: string of start nodes.
 * @str2: string of destination nodes.
@@ -349,10 +386,10 @@ bool find_path(graph *g, node *src, node *dest)
 *
 * Returns: Number of unique nodes.
 */
-int count_nodes(char **str1, char **str2, int edges)
+int count_nodes(char **str1, char **str2, int edges, long int file_size)
 {
         // Allocate memory for unique nodes
-        char **uniquenodes = malloc(BUFSIZE);
+        char **uniquenodes = malloc(file_size);
         // Initiate number of unique nodes to 0
         int cnt = 0;
         // This is a status that it used to determine whether a given node already exists
@@ -383,7 +420,7 @@ int count_nodes(char **str1, char **str2, int edges)
                 {
                         // Insert tempstr1 to uniquenodes if it doesn't already exist
                         // and increase cnt by 1.
-                        uniquenodes[cnt] = malloc(BUFSIZE);
+                        uniquenodes[cnt] = malloc(file_size);
                         strcpy(uniquenodes[cnt], tempstr1);
                         cnt++;
                 }
@@ -391,7 +428,7 @@ int count_nodes(char **str1, char **str2, int edges)
                 {
                         // Insert tempstr2 to uniquenodes if it doesn't already exist
                         // and increase cnt by 1.
-                        uniquenodes[cnt] = malloc(BUFSIZE);
+                        uniquenodes[cnt] = malloc(file_size);
                         strcpy(uniquenodes[cnt], tempstr2);
                         cnt++;
                 }
@@ -419,25 +456,32 @@ void set_nodes_to_empty(char *empty_node1, char *empty_node2)
 }
 
 /**
-* get_file_size() - Reads and parses information from the map file
-* containing a description of a graph.
-* @fp:   Pointer to file. 
+* open_file() - Checks that the file specified exists and is non-empty
+* and reads it in. 
+* @argv: Command line arguments.
 *
-* Returns: Number of characters in file
+* Returns: Pointer to the file
 */
-int get_file_size(FILE *fp)
-{
-        // Save position of beginning
-	long int prev = ftell(fp);
-	// Go to end of file
-	fseek(fp, 0L, SEEK_END);
-	// Save position of end
-	long int sz = ftell(fp);
-	// Go back to beginning
-	fseek(fp,prev,SEEK_SET);
-	return sz;
-}
-
+/*FILE * open_file(const char **argv)*/
+/*{*/
+        /*FILE *in;*/
+        /*// Reads in the map-file to 'in'*/
+        /*if (argv[1] != NULL)*/
+        /*{*/
+                /*in = fopen(argv[1], "r");*/
+        /*}*/
+        /*else */
+        /*{*/
+                /*fprintf(stderr,"ERROR: No input!\n");*/
+                /*exit(EXIT_FAILURE);*/
+        /*}*/
+        /*if(in == NULL) */
+        /*{*/
+                /*fprintf(stderr,"ERROR: Empty file!\n");*/
+                /*exit(EXIT_FAILURE);*/
+        /*}*/
+	/*return in;*/
+/*} */
 /**
 * read_map() - Reads and parses information from the map file
 * containing a description of a graph.
@@ -448,27 +492,27 @@ int get_file_size(FILE *fp)
 *
 * Returns: Number of edges in the graph.
 */
-int read_map(const char **argv, int *iter, char **str1, char **str2)
+int read_map(const char **argv, int *iter, char **str1, char **str2, long int file_size)
 {
-        FILE *in;
+	FILE *in;
         int edges, length1, length2;
         int check = 0;
         // Reads in the map-file to 'in'
-        if (argv[1] != NULL)
-        {
-                in = fopen(argv[1], "r");
-        }
-        else 
-        {
-                fprintf(stderr,"ERROR: No input!\n");
-                exit(EXIT_FAILURE);
-        }
-        if(in == NULL) 
-        {
-                fprintf(stderr,"ERROR: Empty file!\n");
-                exit(EXIT_FAILURE);
-        }
-	long int file_size = get_file_size(in);
+	if (argv[1] != NULL)
+	{
+		in = fopen(argv[1], "r");
+	}
+	else 
+	{
+		fprintf(stderr,"ERROR: No input!\n");
+		exit(EXIT_FAILURE);
+	}
+	if(in == NULL) 
+	{
+		fprintf(stderr,"ERROR: Empty file!\n");
+		exit(EXIT_FAILURE);
+	}
+	/**file_size = get_file_size(in);*/
         char line[file_size];
         char **information = malloc(file_size);
 
@@ -513,8 +557,8 @@ int read_map(const char **argv, int *iter, char **str1, char **str2)
                 }
 
                 // Allocates two string elements
-                str1[*iter] = malloc(BUFSIZE);
-                str2[*iter] = malloc(BUFSIZE);
+                str1[*iter] = malloc(file_size);
+                str2[*iter] = malloc(file_size);
                 length1 = white_space(information[*iter]);
                 length2 = strlen(information[*iter]) - length1 - 1;
                 // Adds a terminator to string
@@ -534,7 +578,7 @@ int read_map(const char **argv, int *iter, char **str1, char **str2)
         // Frees allocated memory used by information
         free(information);
         // Closes the read file
-        fclose(in);
+	fclose(in);
         return edges;
 }
 
@@ -583,22 +627,24 @@ char *nodes_do_not_exist(node *origin, node *destination, char *node1, char *nod
 
 int main(int argc, const char **argv)
 {
-        char line[BUFSIZE];
+	/*FILE *in = open_file(argv);*/
+	long int file_size = get_file_size(argv);
+        char line[file_size];
         int edges;
         int it = 0;
         int *iter = &it;
-        char **str1 = malloc(BUFSIZE);
-        char **str2 = malloc(BUFSIZE);
+        char **str1 = malloc(file_size);
+        char **str2 = malloc(file_size);
 
         // Read map file, return nr of edges
-        edges = read_map(argv, iter, str1, str2);
+        edges = read_map(argv, iter, str1, str2, file_size);
 
         // Build graph from map information
-        graph *g = build_graph(str1, str2, count_nodes(str1, str2, edges), edges);
+        graph *g = build_graph(str1, str2, count_nodes(str1, str2, edges, file_size), edges);
 
         // Initialize node names as empty
-        char node1[BUFSIZE];
-        char node2[BUFSIZE];
+        char node1[file_size];
+        char node2[file_size];
         set_nodes_to_empty(node1, node2);
         do
         {
